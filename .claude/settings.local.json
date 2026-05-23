@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./mvnw compile *)",
+      "Bash(./mvnw test *)",
+      "Bash(psql --version)",
+      "Bash(docker --version)",
+      "PowerShell(psql --version 2>&1)",
+      "PowerShell(docker --version 2>&1)"
+    ]
+  }
+}
