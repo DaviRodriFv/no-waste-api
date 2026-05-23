@@ -35,10 +35,9 @@ public class ResiduoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResiduoResponseDTO> criar(
             @Valid @ModelAttribute ResiduoRequestDTO dto,
-            @RequestParam(required = false) MultipartFile laudoTecnico,
-            @RequestParam(required = false) MultipartFile orcamentoDescarte) {
+            @RequestParam(required = false) List<MultipartFile> laudos) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(residuoService.criar(dto, laudoTecnico, orcamentoDescarte));
+                .body(residuoService.criar(dto, laudos));
     }
 
     @GetMapping
@@ -68,9 +67,8 @@ public class ResiduoController {
     public ResponseEntity<ResiduoResponseDTO> atualizar(
             @PathVariable Long id,
             @Valid @ModelAttribute ResiduoRequestDTO dto,
-            @RequestParam(required = false) MultipartFile laudoTecnico,
-            @RequestParam(required = false) MultipartFile orcamentoDescarte) {
-        return ResponseEntity.ok(residuoService.atualizar(id, dto, laudoTecnico, orcamentoDescarte));
+            @RequestParam(required = false) List<MultipartFile> laudos) {
+        return ResponseEntity.ok(residuoService.atualizar(id, dto, laudos));
     }
 
     @PatchMapping("/{id}/status")

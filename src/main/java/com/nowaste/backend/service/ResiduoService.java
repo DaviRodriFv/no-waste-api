@@ -35,7 +35,7 @@ public class ResiduoService {
 
     // TODO: adicionar @PreAuthorize quando auth for implementado
     @Transactional
-    public ResiduoResponseDTO criar(ResiduoRequestDTO dto, MultipartFile laudoTecnico, MultipartFile orcamentoDescarte) {
+    public ResiduoResponseDTO criar(ResiduoRequestDTO dto, List<MultipartFile> laudos) {
         if (!dto.isAceitouTermos()) {
             throw new BadRequestException("aceitouTermos deve ser true para publicar o resíduo");
         }
@@ -56,7 +56,7 @@ public class ResiduoService {
                 .build();
 
         residuo = residuoRepository.save(residuo);
-        anexarDocumentos(residuo, laudoTecnico, orcamentoDescarte);
+        anexarLaudos(residuo, laudos);
         residuo = residuoRepository.save(residuo);
 
         return toResponseDTO(residuo);
@@ -81,8 +81,7 @@ public class ResiduoService {
 
     // TODO: adicionar @PreAuthorize quando auth for implementado
     @Transactional
-    public ResiduoResponseDTO atualizar(Long id, ResiduoRequestDTO dto,
-                                         MultipartFile laudoTecnico, MultipartFile orcamentoDescarte) {
+    public ResiduoResponseDTO atualizar(Long id, ResiduoRequestDTO dto, List<MultipartFile> laudos) {
         Residuo residuo = findById(id);
 
         residuo.setNome(dto.getNome());
@@ -99,7 +98,7 @@ public class ResiduoService {
             residuo.setAceiteTermos(true);
         }
 
-        anexarDocumentos(residuo, laudoTecnico, orcamentoDescarte);
+        anexarLaudos(residuo, laudos);
         return toResponseDTO(residuoRepository.save(residuo));
     }
 
@@ -176,29 +175,21 @@ public class ResiduoService {
         };
     }
 
-    private void anexarDocumentos(Residuo residuo, MultipartFile laudoTecnico, MultipartFile orcamentoDescarte) {
-        if (laudoTecnico != null && !laudoTecnico.isEmpty()) {
-            String caminho = fileStorageService.store(laudoTecnico, residuo.getId());
-            residuo.getDocumentos().add(DocumentoResiduo.builder()
-                    .residuo(residuo)
-                    .tipoDocumento(TipoDocumento.LAUDO_TECNICO)
-                    .nomeArquivo(laudoTecnico.getOriginalFilename())
-                    .caminho(caminho)
-                    .contentType(laudoTecnico.getContentType())
-                    .tamanhoBytes(laudoTecnico.getSize())
-                    .build());
-        }
-        if (orcamentoDescarte != null && !orcamentoDescarte.isEmpty()) {
-            String caminho = fileStorageService.store(orcamentoDescarte, residuo.getId());
-            residuo.getDocumentos().add(DocumentoResiduo.builder()
-                    .residuo(residuo)
-                    .tipoDocumento(TipoDocumento.ORCAMENTO_DESCARTE)
-                    .nomeArquivo(orcamentoDescarte.getOriginalFilename())
-                    .caminho(caminho)
-                    .contentType(orcamentoDescarte.getContentType())
-                    .tamanhoBytes(orcamentoDescarte.getSize())
-                    .build());
-        }
+    private void anexarLaudos(Residuo residuo, List<MultipartFile> laudos) {
+        if (laudos == null) return;
+        laudos.stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .forEach(f -> {
+                    String caminho = fileStorageService.store(f, residuo.getId());
+                    residuo.getDocumentos().add(DocumentoResiduo.builder()
+                            .residuo(residuo)
+                            .tipoDocumento(TipoDocumento.LAUDO_TECNICO)
+                            .nomeArquivo(f.getOriginalFilename())
+                            .caminho(caminho)
+                            .contentType(f.getContentType())
+                            .tamanhoBytes(f.getSize())
+                            .build());
+                });
     }
 
     Residuo findById(Long id) {
