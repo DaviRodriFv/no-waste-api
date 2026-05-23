@@ -6,7 +6,13 @@
       "Bash(psql --version)",
       "Bash(docker --version)",
       "PowerShell(psql --version 2>&1)",
-      "PowerShell(docker --version 2>&1)"
+      "PowerShell(docker --version 2>&1)",
+      "PowerShell(& \"C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\psql.exe\" -U postgres -c \"ALTER USER postgres WITH PASSWORD 'postgres';\" 2>&1)",
+      "PowerShell($env:PGPASSWORD = \"davi123veiga\"; & \"C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\psql.exe\" -U postgres -c \"CREATE DATABASE nowaste;\" 2>&1)",
+      "PowerShell(cd \"c:\\\\Users\\\\natha\\\\Documents\\\\GitHub\\\\no-waste-api\"; .\\\\mvnw.cmd spring-boot:run 2>&1 | Out-File \"$env:TEMP\\\\nowaste-log.txt\" -Encoding utf8; Get-Content \"$env:TEMP\\\\nowaste-log.txt\" | Select-String -Pattern \"ERROR|Schema|missing|Wrong|column|table|Cannot|Unable|Exception\" | Select-Object -First 30)",
+      "PowerShell($proc = Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue | Select-Object -First 1; if \\($proc\\) { Stop-Process -Id $proc.OwningProcess -Force; \"Processo na porta 8080 encerrado.\" } else { \"Nenhum processo na porta 8080.\" })",
+      "PowerShell($env:PGPASSWORD = \"davi123veiga\"; & \"C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\psql.exe\" -U postgres -d nowaste -c \"SELECT tablename FROM pg_tables WHERE schemaname = 'public';\" 2>&1)",
+      "PowerShell($env:PGPASSWORD = \"davi123veiga\"; & \"C:\\\\Program Files\\\\PostgreSQL\\\\18\\\\bin\\\\psql.exe\" -U postgres -d nowaste -c \"SELECT id, nome, status, aceite_termos FROM residuos ORDER BY id;\" 2>&1)"
     ]
   }
 }
